@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+"http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+	<constant name="struts.devMode" value="true" />
+	<package name="basicstruts2" extends="struts-default"
+		strict-method-invocation="false">
+		<interceptors>
+			<interceptor class="Interceptor.LoginInterceptor"
+				name="loginInterceptor">
+			</interceptor>
+			<interceptor-stack name="loginStack">
+				<interceptor-ref name="loginInterceptor" />
+				<interceptor-ref name="defaultStack" />
+			</interceptor-stack>
+
+			<interceptor class="Interceptor.AuthenticatedInterceptor"
+				name="authenticatedInterceptor">
+			</interceptor>
+
+			<interceptor class="Interceptor.RoleInterceptor"
+				name="roleBasedIntercetor" />
+			<interceptor-stack
+				name="roleBasedDefaultInterceptor">
+				<interceptor-ref name="params" />
+				<interceptor-ref name="roleBasedIntercetor" />
+			</interceptor-stack>
+
+
+		</interceptors>
+
+
+
+		<action name="" class="Action.KhachAction" method="home">
+			<result name="success">/WEB-INF/khach/thucdon.jsp</result>
+		</action>
+
+		<action name="home" class="Action.KhachAction" method="home">
+			<result name="success">/WEB-INF/khach/thucdon.jsp</result>
+		</action>
+
+		<action name="login">
+			<interceptor-ref name="authenticatedInterceptor" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="admin" type="redirect">homeAdminAction</result>
+			<result name="khach" type="redirect">homeKhachAction</result>
+		</action>
+
+		<!-- loginUser -->
+		<action name="loginUser" class="Action.LoginAction"
+			method="login">
+			<result name="loginfail">/WEB-INF/login.jsp</result>
+			<result name="admin" type="redirect">homeAdminAction</result>
+			<result name="khach" type="redirect">homeKhachAction</result>
+		</action>
+
+		<action name="logoutUser" class="Action.LoginAction"
+			method="logout">
+			<result name="login">/WEB-INF/khach/thucdon.jsp</result>
+		</action>
+
+
+
+		<!-- homeAdminAction -->
+		<action name="homeAdminAction" class="Action.AdminAction"
+			method="home">
+			<interceptor-ref name="loginInterceptor" />
+			<interceptor-ref name="params" />
+			<interceptor-ref name="roleBasedIntercetor">
+				<param name="allowedRoles">admin</param>
+			</interceptor-ref>
+			<result name="error">/WEB-INF/error.jsp</result>
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/home.jsp</result>
+		</action>
+
+		<action name="listDanhMucAction" class="Action.DanhMucAction"
+			method="list">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/list.jsp</result>
+		</action>
+		
+		<action name="createDanhMucAction" class="Action.DanhMucAction"
+			method="create">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/create.jsp</result>
+		</action>
+		
+		<action name="storeDanhMucAction" class="Action.DanhMucAction"
+			method="store">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/list.jsp</result>
+		</action>
+		
+		<action name="editDanhMucAction" class="Action.DanhMucAction"
+			method="edit">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/edit.jsp</result>
+		</action>
+		
+		<action name="updateDanhMucAction" class="Action.DanhMucAction"
+			method="update">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/list.jsp</result>
+		</action>
+		
+		<action name="deleteDanhMucAction" class="Action.DanhMucAction"
+			method="delete">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/danhmuc/list.jsp</result>
+		</action>
+
+		<action name="*FoodAction" class="Action.FoodAction"
+			method="{1}">
+			<interceptor-ref name="fileUpload" />
+			<interceptor-ref name="basicStack" />
+
+			<interceptor-ref name="loginInterceptor" />
+			<interceptor-ref name="params" />
+
+			<interceptor-ref name="roleBasedIntercetor">
+				<param name="allowedRoles">admin</param>
+			</interceptor-ref>
+
+			<interceptor-ref name="validation">
+				<param name="excludeMethods">list,edit,delete,create</param>
+			</interceptor-ref>
+			<interceptor-ref name="workflow" />
+
+			<result name="error">/WEB-INF/error.jsp</result>
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/food/{1}.jsp</result>
+			<result name="list" type="chain">listFoodAction</result>
+			<result name="input">/WEB-INF/admin/food/{1}.jsp</result>
+
+		</action>
+
+		<action name="listUserAction" class="Action.LoginAction"
+			method="list">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/admin/user/list.jsp</result>
+
+		</action>
+
+
+
+		<!-- homeKhachAction -->
+		<action name="homeKhachAction" class="Action.KhachAction"
+			method="home">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/thucdon.jsp</result>
+
+		</action>
+		<action name="deleteAction" class="Action.KhachAction"
+			method="delete">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/giohang.jsp</result>
+
+		</action>
+
+		<action name="updateAction" class="Action.KhachAction"
+			method="update">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/giohang.jsp</result>
+		</action>
+
+		<action name="thanhtoanAction" class="Action.KhachAction"
+			method="thanhtoan">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/thanhtoan.jsp</result>
+		</action>
+
+		<action name="chitietAction" class="Action.KhachAction"
+			method="chitiet">
+			<result name="success">/WEB-INF/khach/chitiet.jsp</result>
+		</action>
+
+		<action name="searchAction" class="Action.KhachAction"
+			method="timkiem">
+			<result name="success">/WEB-INF/khach/timkiem.jsp</result>
+		</action>
+
+		<action name="orderAction" class="Action.KhachAction"
+			method="order">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/datmon.jsp</result>
+		</action>
+
+		<action name="viewCartAction" class="Action.KhachAction"
+			method="viewCart">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success">/WEB-INF/khach/giohang.jsp</result>
+		</action>
+
+		<action name="submitOrderAction" class="Action.KhachAction"
+			method="submitOrder">
+			<interceptor-ref name="loginStack" />
+			<result name="login">/WEB-INF/login.jsp</result>
+			<result name="success" type="redirect">homeKhachAction</result>
+			<result name="input">/WEB-INF/view/khach/chitiet.jsp</result>
+		</action>
+
+
+
+	</package>
+</struts>
